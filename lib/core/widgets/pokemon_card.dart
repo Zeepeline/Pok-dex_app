@@ -15,7 +15,7 @@ class PokemonCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary,
+          color: Colors.black,
           width: 1,
         ),
       ),
@@ -39,21 +39,7 @@ class PokemonCard extends StatelessWidget {
                     spacing: 8.0,
                     runSpacing: 4.0,
                     children: [
-                      Chip(
-                        avatar: Icon(
-                          Icons.local_fire_department,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        label: Text(
-                          'Fire',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        backgroundColor: Colors.deepOrange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
+                      CustomChip(),
                     ],
                   )
                 ],
@@ -66,10 +52,6 @@ class PokemonCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.red,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary,
-                width: 1,
-              ),
             ),
             child: Stack(
               children: [
@@ -97,6 +79,31 @@ class PokemonCard extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class CustomChip extends StatelessWidget {
+  const CustomChip({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: Icon(
+        Icons.local_fire_department,
+        color: Colors.white,
+        size: 16,
+      ),
+      label: Text(
+        'Fire',
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.deepOrange,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
     );
   }
