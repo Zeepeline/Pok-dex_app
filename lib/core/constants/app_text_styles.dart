@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
+  static const TextStyle headline1 = TextStyle(
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w500,
+    fontSize: 32.0,
+    height: 1.0,
+    letterSpacing: 0.0,
+  );
+
   static const TextStyle headingLarge = TextStyle(
     fontFamily: 'Poppins',
     fontWeight: FontWeight.w600,
@@ -21,6 +29,14 @@ class AppTextStyles {
     fontFamily: 'Poppins',
     fontWeight: FontWeight.w500,
     fontSize: 18.0,
+    height: 1.0,
+    letterSpacing: 0.0,
+  );
+
+  static const TextStyle baseText = TextStyle(
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w500,
+    fontSize: 16.0,
     height: 1.0,
     letterSpacing: 0.0,
   );
