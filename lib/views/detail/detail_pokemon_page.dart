@@ -10,16 +10,32 @@ import 'package:pokedex_app/core/widgets/attribut_display.dart';
 import 'package:pokedex_app/core/widgets/custom_chip.dart';
 import 'package:pokedex_app/core/widgets/pokemon_evolution_card.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
+import 'package:pokedex_app/providers/pokemon_detail_provider.dart';
+import 'package:provider/provider.dart';
 
-class DetailPokemonPage extends StatelessWidget {
+class DetailPokemonPage extends StatefulWidget {
   const DetailPokemonPage({super.key, required this.pokemon});
-
   final PokemonModel pokemon;
+
+  @override
+  State<DetailPokemonPage> createState() => _DetailPokemonPageState();
+}
+
+class _DetailPokemonPageState extends State<DetailPokemonPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PokemonDetailProvider>(context, listen: false)
+          .fetchByIds(widget.pokemon.evolutions);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final mainType = PokemonType.values.firstWhere(
-      (e) => e.name.toLowerCase() == pokemon.typeofpokemon[0].toLowerCase(),
+      (e) =>
+          e.name.toLowerCase() == widget.pokemon.typeofpokemon[0].toLowerCase(),
       orElse: () => PokemonType.normal,
     );
     return Scaffold(
@@ -71,14 +87,17 @@ class DetailPokemonPage extends StatelessWidget {
                   right: 130,
                   child: SizedBox(
                     width: 30,
-                    child: CachedNetworkImage(
-                      imageUrl: pokemon.imageUrl,
-                      fit: BoxFit.fitWidth,
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                      errorWidget: (context, url, error) => const Center(
-                        child: Icon(Icons.error, color: Colors.white),
+                    child: Hero(
+                      tag: 'pokemon-image-${widget.pokemon.id}',
+                      child: CachedNetworkImage(
+                        imageUrl: widget.pokemon.imageUrl,
+                        fit: BoxFit.fitWidth,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error, color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
@@ -92,13 +111,15 @@ class DetailPokemonPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(pokemon.name, style: AppTextStyles.headline1),
+                  Text(widget.pokemon.name, style: AppTextStyles.headline1),
                   Gap(36),
                   Wrap(
                     spacing: 4.0,
                     runSpacing: 4.0,
-                    children:
-                        pokemon.typeofpokemon.asMap().entries.map((entry) {
+                    children: widget.pokemon.typeofpokemon
+                        .asMap()
+                        .entries
+                        .map((entry) {
                       final pokemonElement = entry.value;
 
                       return CustomChipContainer(
@@ -114,7 +135,7 @@ class DetailPokemonPage extends StatelessWidget {
                   ),
                   Gap(36),
                   Text(
-                    pokemon.xdescription,
+                    widget.pokemon.xdescription,
                     style: AppTextStyles.bodyLarge,
                   ),
                   Gap(24),
@@ -136,9 +157,9 @@ class DetailPokemonPage extends StatelessWidget {
                     crossAxisSpacing: 8,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: pokemon.weaknesses.length,
+                    itemCount: widget.pokemon.weaknesses.length,
                     itemBuilder: (context, index) {
-                      final pokemonElement = pokemon.weaknesses[index];
+                      final pokemonElement = widget.pokemon.weaknesses[index];
 
                       return CustomChipContainer(
                         element: pokemonElement,
@@ -168,25 +189,31 @@ class DetailPokemonPage extends StatelessWidget {
     );
   }
 
-  Container _buildPokemonEvolution() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Color(0xFFE6E6E6),
-          width: 1,
-        ),
-      ),
-      child: ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => PokemonEvolutionCard(),
-          separatorBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: SvgPicture.asset('assets/icons/arrow_down.svg'),
+  Widget _buildPokemonEvolution() {
+    return Consumer<PokemonDetailProvider>(
+      builder: (context, value, child) => value.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: Color(0xFFE6E6E6),
+                  width: 1,
+                ),
               ),
-          itemCount: 3),
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) => PokemonEvolutionCard(
+                        pokemon: value.pokemon[index],
+                      ),
+                  separatorBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: SvgPicture.asset('assets/icons/arrow_down.svg'),
+                      ),
+                  itemCount: value.pokemon.length),
+            ),
     );
   }
 
@@ -197,7 +224,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'WEIGHT',
-              data: pokemon.weight,
+              data: widget.pokemon.weight,
               icon: Icons.height,
             ),
           ),
@@ -205,7 +232,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'HEIGHT',
-              data: pokemon.height,
+              data: widget.pokemon.height,
               icon: Icons.height,
             ),
           ),
@@ -217,7 +244,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'CATEGORY',
-              data: pokemon.category,
+              data: widget.pokemon.category,
               icon: Icons.height,
             ),
           ),
@@ -225,7 +252,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'ABILITY',
-              data: pokemon.abilities[0],
+              data: widget.pokemon.abilities[0],
               icon: Icons.height,
             ),
           ),
@@ -243,9 +270,20 @@ class DetailPokemonPage extends StatelessWidget {
             color: Colors.red,
             borderRadius: BorderRadius.all(Radius.circular(50)),
           ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text('FEMALE'), Text('MALE')]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(
+              children: [
+                Icon(Icons.female_outlined),
+                Text(widget.pokemon.femalePercentage ?? '-'),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.male_outlined),
+                Text(widget.pokemon.malePercentage ?? '-'),
+              ],
+            )
+          ]),
         ],
       ),
     ]);

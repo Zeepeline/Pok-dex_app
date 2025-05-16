@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
+import 'package:pokedex_app/core/widgets/slide_from_bottom_page.dart';
 import 'package:pokedex_app/views/detail/detail_pokemon_page.dart';
 import 'package:pokedex_app/views/home/home_page.dart';
 
@@ -23,7 +24,7 @@ class MyRouterDelegate extends RouterDelegate<Object>
         pages: [
           MaterialPage(child: HomePage()),
           if (appState.selectedPokemon != null)
-            MaterialPage(
+            SlideFromBottomPage(
                 child: DetailPokemonPage(pokemon: appState.selectedPokemon!)),
         ],
         onDidRemovePage: (page) {

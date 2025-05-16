@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card.dart';
+import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
+import 'package:pokedex_app/providers/pokemon_search_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,6 +21,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +37,12 @@ class _HomePageState extends State<HomePage>
         provider.fetchNextPokemonPage();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
@@ -74,23 +86,73 @@ class _HomePageState extends State<HomePage>
               _buildFilterType(),
               Gap(16),
               provider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : Consumer<PokemonProvider>(
-                      builder: (context, provider, child) => ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: provider.pokemonList.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          separatorBuilder: (context, index) => Gap(16),
-                          itemBuilder: (context, index) => InkWell(
-                                onTap: () {
-                                  context.read<AppState>().selectPokemon(
-                                      provider.pokemonList[index]);
-                                },
-                                child: PokemonCard(
-                                  pokemon: provider.pokemonList[index],
+                  ? const Center(
+                      child: Column(
+                      children: [
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                        PokemonCardShimmer(),
+                        Gap(16),
+                      ],
+                    ))
+                  : Consumer2<PokemonProvider, PokemonSearchProvider>(
+                      builder: (context, pokemonProvider, searchProvider, _) {
+                        final isSearching =
+                            searchProvider.searchText.isNotEmpty;
+                        final pokemonList = isSearching
+                            ? searchProvider.searchResult
+                            : pokemonProvider.pokemonList;
+
+                        return pokemonList.isEmpty
+                            ? Center(
+                                child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                              )),
-                    ),
+                                child: Column(
+                                  children: [
+                                    SvgPicture.network(
+                                        'https://veekun.com/dex/media/pokemon/dream-world/201-question.svg'),
+                                    Gap(16),
+                                    Text(
+                                      'No Pokemon found',
+                                      style: AppTextStyles.subtitle,
+                                    ),
+                                  ],
+                                ),
+                              ))
+                            : ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: pokemonList.length,
+                                separatorBuilder: (_, __) => Gap(16),
+                                itemBuilder: (context, index) {
+                                  final pokemon = pokemonList[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      context
+                                          .read<AppState>()
+                                          .selectPokemon(pokemon);
+                                    },
+                                    child: PokemonCard(pokemon: pokemon),
+                                  );
+                                },
+                              );
+                      },
+                    )
             ],
           ),
         ),
@@ -160,6 +222,13 @@ class _HomePageState extends State<HomePage>
           ),
         ),
       ),
+      onChanged: (value) {
+        if (_debounce?.isActive ?? false) _debounce!.cancel();
+        _debounce = Timer(const Duration(milliseconds: 300), () {
+          Provider.of<PokemonSearchProvider>(context, listen: false)
+              .fetchByNames(value);
+        });
+      },
     );
   }
 
