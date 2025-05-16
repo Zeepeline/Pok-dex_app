@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/widgets/slide_from_bottom_page.dart';
 import 'package:pokedex_app/views/detail/detail_pokemon_page.dart';
-import 'package:pokedex_app/views/home/home_page.dart';
+import 'package:pokedex_app/views/navigation/main_navigation.dart';
 
 class MyRouterDelegate extends RouterDelegate<Object>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<Object> {
@@ -22,7 +22,7 @@ class MyRouterDelegate extends RouterDelegate<Object>
     return Navigator(
         key: navigatorKey,
         pages: [
-          MaterialPage(child: HomePage()),
+          MaterialPage(child: MainNavigation()),
           if (appState.selectedPokemon != null)
             SlideFromBottomPage(
                 child: DetailPokemonPage(pokemon: appState.selectedPokemon!)),

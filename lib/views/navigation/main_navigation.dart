@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/providers/tab_provider.dart';
+import 'package:pokedex_app/views/favorite/favorite_pokemon_page.dart';
 import 'package:pokedex_app/views/home/home_page.dart';
+import 'package:provider/provider.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -11,13 +14,14 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  final PageController _pageController = PageController();
+  late PageController _pageController;
+  late TabProvider _tabProvider;
+  late VoidCallback _tabListener;
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
     Center(child: HomePage()),
-    Center(child: Text('Favorite')),
-    // Center(child: DetailPokemonPage()),
+    Center(child: FavoritePokemonPage()),
   ];
 
   void _onItemTapped(int index) {
@@ -31,6 +35,10 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
+  void goToFavoriteTab() {
+    _onItemTapped(1);
+  }
+
   void _onPageChanged(int index) {
     setState(() {
       _selectedIndex = index;
@@ -40,6 +48,24 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   void initState() {
     super.initState();
+    // Ambil TabProvider dan listen perubahan selectedIndex
+    _tabProvider = context.read<TabProvider>();
+    _selectedIndex = _tabProvider.selectedIndex;
+    _pageController = PageController(initialPage: _selectedIndex);
+
+    _tabListener = () {
+      final newIndex = _tabProvider.selectedIndex;
+      if (newIndex != _selectedIndex) {
+        _selectedIndex = newIndex;
+        _pageController.animateToPage(
+          _selectedIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        setState(() {});
+      }
+    };
+    _tabProvider.addListener(_tabListener);
   }
 
   @override
