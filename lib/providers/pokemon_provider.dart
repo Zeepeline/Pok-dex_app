@@ -14,6 +14,7 @@ class PokemonProvider with ChangeNotifier {
   bool _isLoading = false;
 
   List<PokemonModel> get pokemonList => _visiblePokemon;
+  List<PokemonModel> get allPokemon => _allPokemon;
   bool get isLoading => _isLoading;
 
   Future<void> initData() async {
@@ -51,7 +52,6 @@ class PokemonProvider with ChangeNotifier {
     );
 
     _visiblePokemon.addAll(nextPage);
-    print('test ${_visiblePokemon.length}');
 
     _currentPage++;
     notifyListeners();
