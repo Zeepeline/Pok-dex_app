@@ -11,6 +11,8 @@ import 'package:pokedex_app/core/widgets/custom_chip.dart';
 import 'package:pokedex_app/core/widgets/pokemon_evolution_card.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_detail_provider.dart';
+import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
+import 'package:pokedex_app/providers/tab_provider.dart';
 import 'package:provider/provider.dart';
 
 class DetailPokemonPage extends StatefulWidget {
@@ -50,11 +52,24 @@ class _DetailPokemonPageState extends State<DetailPokemonPage> {
               color: Colors.white,
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 24),
-                child: Icon(
-                  Icons.heart_broken,
-                  color: Colors.white,
+              Consumer<PokemonFavoriteProvider>(
+                builder: (context, value, child) => InkWell(
+                  onTap: () {
+                    value.toggleFavorite(widget.pokemon.id);
+
+                    if (value.isFavorite(widget.pokemon.id)) {
+                      context.read<TabProvider>().setIndex(1);
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 24),
+                    child: SvgPicture.asset(
+                      value.isFavorite(widget.pokemon.id)
+                          ? 'assets/icons/selected_favorite_2.svg'
+                          : 'assets/icons/unselected_favorite_2.svg',
+                    ),
+                  ),
                 ),
               )
             ],

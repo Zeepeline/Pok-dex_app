@@ -5,8 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/core/helpers/toast_helpers.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
+import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:pokedex_app/providers/pokemon_search_provider.dart';
 import 'package:provider/provider.dart';
@@ -105,8 +107,10 @@ class _HomePageState extends State<HomePage>
                         Gap(16),
                       ],
                     ))
-                  : Consumer2<PokemonProvider, PokemonSearchProvider>(
-                      builder: (context, pokemonProvider, searchProvider, _) {
+                  : Consumer3<PokemonProvider, PokemonSearchProvider,
+                      PokemonFavoriteProvider>(
+                      builder: (context, pokemonProvider, searchProvider,
+                          favoriteProvider, _) {
                         final isSearching =
                             searchProvider.searchText.isNotEmpty;
                         final pokemonList = isSearching
@@ -141,13 +145,33 @@ class _HomePageState extends State<HomePage>
                                 separatorBuilder: (_, __) => Gap(16),
                                 itemBuilder: (context, index) {
                                   final pokemon = pokemonList[index];
+                                  final isFav =
+                                      favoriteProvider.isFavorite(pokemon.id);
                                   return InkWell(
                                     onTap: () {
                                       context
                                           .read<AppState>()
                                           .selectPokemon(pokemon);
                                     },
-                                    child: PokemonCard(pokemon: pokemon),
+                                    child: PokemonCard(
+                                      pokemon: pokemon,
+                                      isFavorite: isFav,
+                                      onFavoriteTap: () {
+                                        favoriteProvider
+                                            .toggleFavorite(pokemon.id);
+                                        if (!isFav) {
+                                          successToast(
+                                              context,
+                                              'Added to favorites',
+                                              '${pokemon.name} added to favorites!');
+                                        } else {
+                                          failToast(
+                                              context,
+                                              'Removed from favorites',
+                                              '${pokemon.name} removed from favorites!');
+                                        }
+                                      },
+                                    ),
                                   );
                                 },
                               );

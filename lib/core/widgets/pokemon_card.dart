@@ -12,8 +12,12 @@ class PokemonCard extends StatelessWidget {
   const PokemonCard({
     super.key,
     required this.pokemon,
+    required this.isFavorite,
+    required this.onFavoriteTap,
   });
   final PokemonModel pokemon;
+  final bool isFavorite;
+  final VoidCallback onFavoriteTap;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +101,11 @@ class PokemonCard extends StatelessWidget {
                 Positioned(
                     top: 8,
                     right: 8,
-                    child: SvgPicture.asset('assets/icons/love_disable.svg'))
+                    child: InkWell(
+                        onTap: onFavoriteTap,
+                        child: SvgPicture.asset(isFavorite
+                            ? 'assets/icons/selected_love.svg'
+                            : 'assets/icons/love_disable.svg')))
               ],
             ),
           )
