@@ -3,14 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/core/enums/pokemon_enum.dart';
+import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
+import 'package:pokedex_app/core/widgets/custom_chip.dart';
+import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class PokemonCard extends StatelessWidget {
   const PokemonCard({
     super.key,
+    required this.pokemon,
   });
+  final PokemonModel pokemon;
 
   @override
   Widget build(BuildContext context) {
+    final mainType = PokemonType.values.firstWhere(
+      (e) => e.name.toLowerCase() == pokemon.typeofpokemon[0].toLowerCase(),
+      orElse: () => PokemonType.normal,
+    );
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
@@ -31,16 +41,27 @@ class PokemonCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Pokemon Name',
+                    pokemon.name,
                     style: AppTextStyles.headingMedium,
                   ),
                   Gap(8),
                   Wrap(
-                    spacing: 8.0,
+                    spacing: 4.0,
                     runSpacing: 4.0,
-                    children: [
-                      CustomChip(),
-                    ],
+                    children:
+                        pokemon.typeofpokemon.asMap().entries.map((entry) {
+                      final pokemonElement = entry.value;
+
+                      return CustomChipContainer(
+                        element: pokemonElement,
+                        type: PokemonType.values.firstWhere(
+                          (e) =>
+                              e.name.toLowerCase() ==
+                              pokemonElement.toLowerCase(),
+                          orElse: () => PokemonType.normal,
+                        ),
+                      );
+                    }).toList(),
                   )
                 ],
               ),
@@ -50,7 +71,7 @@ class PokemonCard extends StatelessWidget {
             height: 130,
             width: MediaQuery.of(context).size.width * 0.4,
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: mainType.color,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Stack(
@@ -59,8 +80,7 @@ class PokemonCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: CachedNetworkImage(
-                      imageUrl:
-                          'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
+                      imageUrl: pokemon.imageUrl,
                       fit: BoxFit.contain,
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(),
@@ -79,31 +99,6 @@ class PokemonCard extends StatelessWidget {
             ),
           )
         ],
-      ),
-    );
-  }
-}
-
-class CustomChip extends StatelessWidget {
-  const CustomChip({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      avatar: Icon(
-        Icons.local_fire_department,
-        color: Colors.white,
-        size: 16,
-      ),
-      label: Text(
-        'Fire',
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.deepOrange,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
       ),
     );
   }

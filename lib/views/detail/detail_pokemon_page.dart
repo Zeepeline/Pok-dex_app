@@ -1,17 +1,27 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/core/enums/pokemon_enum.dart';
+import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 import 'package:pokedex_app/core/widgets/attribut_display.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card.dart';
+import 'package:pokedex_app/core/widgets/custom_chip.dart';
 import 'package:pokedex_app/core/widgets/pokemon_evolution_card.dart';
+import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class DetailPokemonPage extends StatelessWidget {
-  const DetailPokemonPage({super.key});
+  const DetailPokemonPage({super.key, required this.pokemon});
+
+  final PokemonModel pokemon;
 
   @override
   Widget build(BuildContext context) {
+    final mainType = PokemonType.values.firstWhere(
+      (e) => e.name.toLowerCase() == pokemon.typeofpokemon[0].toLowerCase(),
+      orElse: () => PokemonType.normal,
+    );
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -23,7 +33,6 @@ class DetailPokemonPage extends StatelessWidget {
               Icons.arrow_back_ios_new_outlined,
               color: Colors.white,
             ),
-            // elevation: 0,
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 24),
@@ -33,9 +42,9 @@ class DetailPokemonPage extends StatelessWidget {
                 ),
               )
             ],
-            backgroundColor: Colors.blue,
-            surfaceTintColor: Colors.blue,
-            foregroundColor: Colors.blue,
+            backgroundColor: mainType.color,
+            surfaceTintColor: mainType.color,
+            foregroundColor: mainType.color,
             elevation: 0,
           ),
           SliverToBoxAdapter(
@@ -51,7 +60,7 @@ class DetailPokemonPage extends StatelessWidget {
                     width: 500,
                     height: 500,
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: mainType.color,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -63,8 +72,7 @@ class DetailPokemonPage extends StatelessWidget {
                   child: SizedBox(
                     width: 30,
                     child: CachedNetworkImage(
-                      imageUrl:
-                          'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
+                      imageUrl: pokemon.imageUrl,
                       fit: BoxFit.fitWidth,
                       placeholder: (context, url) => const Center(
                         child: CircularProgressIndicator(),
@@ -84,11 +92,29 @@ class DetailPokemonPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Bulbasaur', style: AppTextStyles.headline1),
+                  Text(pokemon.name, style: AppTextStyles.headline1),
                   Gap(36),
-                  CustomChip(),
+                  Wrap(
+                    spacing: 4.0,
+                    runSpacing: 4.0,
+                    children:
+                        pokemon.typeofpokemon.asMap().entries.map((entry) {
+                      final pokemonElement = entry.value;
+
+                      return CustomChipContainer(
+                        element: pokemonElement,
+                        type: PokemonType.values.firstWhere(
+                          (e) =>
+                              e.name.toLowerCase() ==
+                              pokemonElement.toLowerCase(),
+                          orElse: () => PokemonType.normal,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  Gap(36),
                   Text(
-                    '''Bulbasaur can be seen napping in bright sunlight. There is a seed on its back. By soaking up the sun's rays, the seed grows progressively larger.''',
+                    pokemon.xdescription,
                     style: AppTextStyles.bodyLarge,
                   ),
                   Gap(24),
@@ -104,7 +130,27 @@ class DetailPokemonPage extends StatelessWidget {
                     style: AppTextStyles.subtitle,
                   ),
                   Gap(8),
-                  CustomChip(),
+                  MasonryGridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: pokemon.weaknesses.length,
+                    itemBuilder: (context, index) {
+                      final pokemonElement = pokemon.weaknesses[index];
+
+                      return CustomChipContainer(
+                        element: pokemonElement,
+                        type: PokemonType.values.firstWhere(
+                          (e) =>
+                              e.name.toLowerCase() ==
+                              pokemonElement.toLowerCase(),
+                          orElse: () => PokemonType.normal,
+                        ),
+                      );
+                    },
+                  ),
                   Gap(24),
                   Text(
                     'Evolution',
@@ -151,7 +197,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'WEIGHT',
-              data: '0.7 m',
+              data: pokemon.weight,
               icon: Icons.height,
             ),
           ),
@@ -159,7 +205,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'HEIGHT',
-              data: '0.7 m',
+              data: pokemon.height,
               icon: Icons.height,
             ),
           ),
@@ -171,7 +217,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'CATEGORY',
-              data: '0.7 m',
+              data: pokemon.category,
               icon: Icons.height,
             ),
           ),
@@ -179,7 +225,7 @@ class DetailPokemonPage extends StatelessWidget {
           Flexible(
             child: AttributDisplay(
               title: 'ABILITY',
-              data: '0.7 m',
+              data: pokemon.abilities[0],
               icon: Icons.height,
             ),
           ),
