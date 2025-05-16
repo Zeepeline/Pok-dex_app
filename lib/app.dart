@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex_app/views/navigation/main_navigation.dart';
+import 'package:pokedex_app/core/constants/app_route.dart';
+import 'package:pokedex_app/core/constants/app_state.dart';
+import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -7,13 +9,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final appState = Provider.of<AppState>(context, listen: false);
+    return MaterialApp.router(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: MainNavigation(),
+      routerDelegate: MyRouterDelegate(appState),
+      // home: MainNavigation(),
     );
   }
 }
