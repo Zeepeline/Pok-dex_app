@@ -1,21 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card.dart';
+import 'package:pokedex_app/providers/pokemon_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-
-  final String title;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
+  final ScrollController _scrollController = ScrollController();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PokemonProvider>(context, listen: false).initData();
+    });
+
+    _scrollController.addListener(() {
+      final provider = Provider.of<PokemonProvider>(context, listen: false);
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent) {
+        provider.fetchNextPokemonPage();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    final provider = context.watch<PokemonProvider>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -45,17 +67,30 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             children: <Widget>[
               Gap(16),
               _buildFilterType(),
               Gap(16),
-              ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: 10,
-                  physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) => Gap(16),
-                  itemBuilder: (context, index) => PokemonCard()),
+              provider.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Consumer<PokemonProvider>(
+                      builder: (context, provider, child) => ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: provider.pokemonList.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          separatorBuilder: (context, index) => Gap(16),
+                          itemBuilder: (context, index) => InkWell(
+                                onTap: () {
+                                  context.read<AppState>().selectPokemon(
+                                      provider.pokemonList[index]);
+                                },
+                                child: PokemonCard(
+                                  pokemon: provider.pokemonList[index],
+                                ),
+                              )),
+                    ),
             ],
           ),
         ),
@@ -127,4 +162,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

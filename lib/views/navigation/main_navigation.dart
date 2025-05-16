@@ -15,9 +15,9 @@ class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
-    Center(child: HomePage(title: 'Home Page')),
-    Center(child: Text('Search Page')),
-    Center(child: Text('Profile Page')),
+    Center(child: HomePage()),
+    Center(child: Text('Favorite')),
+    // Center(child: DetailPokemonPage()),
   ];
 
   void _onItemTapped(int index) {
@@ -38,6 +38,11 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
@@ -53,6 +58,7 @@ class _MainNavigationState extends State<MainNavigation> {
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         showUnselectedLabels: false,
