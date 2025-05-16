@@ -57,7 +57,7 @@ extension PokemonTypeExtension on PokemonType {
       case PokemonType.grass:
         return 'assets/icons/grass_element.svg';
       case PokemonType.rock:
-        return 'assets/icons/rock_element.svg';
+        return 'assets/icons/stone_element.svg';
       case PokemonType.psychic:
         return 'assets/icons/psychic_element.svg';
       case PokemonType.bug:
