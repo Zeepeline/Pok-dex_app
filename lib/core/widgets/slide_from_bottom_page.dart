@@ -2,48 +2,50 @@ import 'package:flutter/material.dart';
 
 class SlideFromBottomPage extends Page {
   final Widget child;
+  final Duration transitionDuration;
+  final Duration reverseTransitionDuration;
 
-  const SlideFromBottomPage({required this.child, super.key});
+  const SlideFromBottomPage({
+    required this.child,
+    super.key,
+    this.transitionDuration = const Duration(milliseconds: 700),
+    this.reverseTransitionDuration = const Duration(milliseconds: 500),
+  });
 
   @override
   Route createRoute(BuildContext context) {
     return PageRouteBuilder(
       settings: this,
-      transitionDuration: const Duration(milliseconds: 700),
-      reverseTransitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: transitionDuration,
+      reverseTransitionDuration: reverseTransitionDuration,
       pageBuilder: (context, animation, secondaryAnimation) => child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        // Curve animasi yang lebih halus dan elegan
-        final curved = CurvedAnimation(
+        final curvedAnimation = CurvedAnimation(
           parent: animation,
-          curve: Curves.easeInOutQuad, // Lebih halus dari easeOutCubic
+          curve: Curves.easeInOutQuad,
         );
 
-        // Slide dari bawah ke atas
-        final slide = Tween<Offset>(
-          begin:
-              const Offset(0, 0.1), // Jangan mulai dari 1 penuh (terasa kasar)
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(0, 0.1), // from bottom
           end: Offset.zero,
-        ).animate(curved);
+        ).animate(curvedAnimation);
 
-        // Fade-in
-        final fade = Tween<double>(
+        final fadeAnimation = Tween<double>(
           begin: 0.0,
           end: 1.0,
-        ).animate(curved);
+        ).animate(curvedAnimation);
 
-        // Sedikit scale untuk efek depth
-        final scale = Tween<double>(
+        final scaleAnimation = Tween<double>(
           begin: 0.98,
           end: 1.0,
-        ).animate(curved);
+        ).animate(curvedAnimation);
 
         return SlideTransition(
-          position: slide,
+          position: slideAnimation,
           child: FadeTransition(
-            opacity: fade,
+            opacity: fadeAnimation,
             child: ScaleTransition(
-              scale: scale,
+              scale: scaleAnimation,
               child: child,
             ),
           ),

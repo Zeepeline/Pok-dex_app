@@ -15,9 +15,7 @@ import 'package:provider/provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-
   await Hive.openBox<List>('favorites');
-
   final remoteDatasource = PokemonRemoteDatasourcesImpl();
   final repository = PokemonRepositoryImpl(remoteDatasource);
 

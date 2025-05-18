@@ -16,56 +16,38 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   late PageController _pageController;
   late TabProvider _tabProvider;
-  late VoidCallback _tabListener;
-  int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
     Center(child: HomePage()),
     Center(child: FavoritePokemonPage()),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void goToFavoriteTab() {
-    _onItemTapped(1);
-  }
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    // Ambil TabProvider dan listen perubahan selectedIndex
     _tabProvider = context.read<TabProvider>();
-    _selectedIndex = _tabProvider.selectedIndex;
-    _pageController = PageController(initialPage: _selectedIndex);
+    _pageController = PageController(initialPage: _tabProvider.selectedIndex);
 
-    _tabListener = () {
+    // Listen to tab changes and update pageController
+    _tabProvider.addListener(() {
       final newIndex = _tabProvider.selectedIndex;
-      if (newIndex != _selectedIndex) {
-        _selectedIndex = newIndex;
+      if (_pageController.hasClients &&
+          _pageController.page?.round() != newIndex) {
         _pageController.animateToPage(
-          _selectedIndex,
+          newIndex,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
-        setState(() {});
       }
-    };
-    _tabProvider.addListener(_tabListener);
+    });
+  }
+
+  void _onItemTapped(int index) {
+    _tabProvider.setTab(index);
+  }
+
+  void _onPageChanged(int index) {
+    _tabProvider.setTab(index);
   }
 
   @override
@@ -76,6 +58,8 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedIndex = context.watch<TabProvider>().selectedIndex;
+
     return Scaffold(
       body: PageView(
         controller: _pageController,
@@ -85,23 +69,23 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
         onTap: _onItemTapped,
         showUnselectedLabels: false,
         selectedLabelStyle: AppTextStyles.label.copyWith(
-          color: Color(0xFF173EA5),
+          color: const Color(0xFF173EA5),
         ),
         items: [
           BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/unselected_pokeball.svg'),
-              activeIcon:
-                  SvgPicture.asset('assets/icons/selected_pokeball.svg'),
-              label: 'Pokedéx'),
+            icon: SvgPicture.asset('assets/icons/unselected_pokeball.svg'),
+            activeIcon: SvgPicture.asset('assets/icons/selected_pokeball.svg'),
+            label: 'Pokedéx',
+          ),
           BottomNavigationBarItem(
-              icon: SvgPicture.asset('assets/icons/unselected_favorite.svg'),
-              activeIcon:
-                  SvgPicture.asset('assets/icons/selected_favorite.svg'),
-              label: 'Favorite'),
+            icon: SvgPicture.asset('assets/icons/unselected_favorite.svg'),
+            activeIcon: SvgPicture.asset('assets/icons/selected_favorite.svg'),
+            label: 'Favorite',
+          ),
         ],
       ),
     );
