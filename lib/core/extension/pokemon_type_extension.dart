@@ -21,23 +21,23 @@ extension PokemonTypeExtension on PokemonType {
         return AppColors.ice;
       case PokemonType.grass:
         return AppColors.grass;
-      case PokemonType.bug:
+      case PokemonType.bug || PokemonType.insect:
         return AppColors.insect;
-      case PokemonType.fighting:
+      case PokemonType.fighting || PokemonType.fighter:
         return AppColors.fighter;
       case PokemonType.normal:
         return AppColors.normal;
-      case PokemonType.dark:
+      case PokemonType.dark || PokemonType.nocturnal:
         return AppColors.nocturnal;
-      case PokemonType.steel:
+      case PokemonType.steel || PokemonType.metal:
         return AppColors.metal;
-      case PokemonType.rock:
+      case PokemonType.rock || PokemonType.stone:
         return AppColors.stone;
       case PokemonType.psychic:
         return AppColors.customPsychic;
-      case PokemonType.ground:
+      case PokemonType.ground || PokemonType.terrestrial:
         return AppColors.terrestrial;
-      case PokemonType.poison:
+      case PokemonType.poison || PokemonType.poisonous:
         return AppColors.poisonous;
       case PokemonType.flying:
         return AppColors.flying;
@@ -56,11 +56,11 @@ extension PokemonTypeExtension on PokemonType {
         return 'assets/icons/ice_element.svg';
       case PokemonType.grass:
         return 'assets/icons/grass_element.svg';
-      case PokemonType.rock:
+      case PokemonType.rock || PokemonType.stone:
         return 'assets/icons/stone_element.svg';
       case PokemonType.psychic:
         return 'assets/icons/psychic_element.svg';
-      case PokemonType.bug:
+      case PokemonType.bug || PokemonType.insect:
         return 'assets/icons/insect_element.svg';
       case PokemonType.flying:
         return 'assets/icons/flying_element.svg';
@@ -72,15 +72,15 @@ extension PokemonTypeExtension on PokemonType {
         return 'assets/icons/dragon_element.svg';
       case PokemonType.normal:
         return 'assets/icons/normal_element.svg';
-      case PokemonType.fighting:
+      case PokemonType.fighting || PokemonType.fighter:
         return 'assets/icons/fighter_element.svg';
-      case PokemonType.dark:
+      case PokemonType.dark || PokemonType.nocturnal:
         return 'assets/icons/nocturnal_element.svg';
-      case PokemonType.steel:
+      case PokemonType.steel || PokemonType.metal:
         return 'assets/icons/metal_element.svg';
-      case PokemonType.ground:
+      case PokemonType.ground || PokemonType.terrestrial:
         return 'assets/icons/terrestrial_element.svg';
-      case PokemonType.poison:
+      case PokemonType.poison || PokemonType.poisonous:
         return 'assets/icons/poisonous_element.svg';
     }
   }
