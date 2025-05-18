@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/core/enums/state_enum.dart';
@@ -47,8 +45,6 @@ class PokemonSearchProvider with ChangeNotifier {
           return poke.name.toLowerCase().contains(search);
         }).toList();
       }
-
-      log(_searchResult.toString());
     } catch (e) {
       debugPrint('Error: $e');
     }

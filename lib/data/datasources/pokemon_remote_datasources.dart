@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:pokedex_app/data/models/pokemon_model.dart';
@@ -16,7 +15,6 @@ class PokemonRemoteDatasourcesImpl implements PokemonRemoteDatasources {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      log(data.toString());
       return data.map((json) => PokemonModel.fromJson(json)).toList();
     } else {
       throw Exception("Failed to load Pokémons");

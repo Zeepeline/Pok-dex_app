@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/helpers/toast_helpers.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
+import 'package:pokedex_app/core/widgets/card/pokemon_card.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,18 @@ class PokemonListView extends StatelessWidget {
       separatorBuilder: (_, __) => const Gap(16),
       itemBuilder: (context, index) {
         if (index == pokemonList.length) {
-          return const PokemonCardShimmer();
+          return Column(
+            children: [
+              Lottie.asset(
+                'assets/lottie/loading.json',
+                width: 80,
+                height: 80,
+                repeat: true,
+              ),
+              Gap(16),
+              Text('Loading...', style: AppTextStyles.subtitle),
+            ],
+          );
         }
         final pokemon = pokemonList[index];
         final isFav = favoriteProvider.isFavorite(pokemon.id);

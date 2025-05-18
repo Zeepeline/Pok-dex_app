@@ -32,8 +32,6 @@ class PokemonProvider with ChangeNotifier {
       _allPokemon = await pokemonRepository.fetchPokemonList();
       _visiblePokemon.clear();
       _currentPage = 0;
-      // _state = PokemonLoadState.loaded;
-      // notifyListeners();
 
       await fetchNextPokemonPage();
     } catch (e) {
@@ -50,8 +48,9 @@ class PokemonProvider with ChangeNotifier {
     final endIndex = (_currentPage + 1) * _pageSize;
 
     if (startIndex >= _allPokemon.length) return;
-
-    // _state = PokemonLoadState.loadingMore;
+    if (_state != PokemonLoadState.loading) {
+      _state = PokemonLoadState.loadingMore;
+    }
     notifyListeners();
 
     await Future.delayed(const Duration(milliseconds: 500));
