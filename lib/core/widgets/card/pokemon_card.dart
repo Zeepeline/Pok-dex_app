@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
-import 'package:pokedex_app/core/widgets/custom_chip.dart';
+import 'package:pokedex_app/core/widgets/chip/custom_chip.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class PokemonCard extends StatelessWidget {

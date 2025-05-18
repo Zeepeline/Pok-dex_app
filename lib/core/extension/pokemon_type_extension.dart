@@ -5,6 +5,8 @@ import 'package:pokedex_app/core/enums/pokemon_enum.dart';
 extension PokemonTypeExtension on PokemonType {
   Color get color {
     switch (this) {
+      case PokemonType.all:
+        return AppColors.allType;
       case PokemonType.water:
         return AppColors.water;
       case PokemonType.dragon:
@@ -46,6 +48,7 @@ extension PokemonTypeExtension on PokemonType {
 
   String get iconPath {
     switch (this) {
+      case PokemonType.all:
       case PokemonType.water:
         return 'assets/icons/water_element.svg';
       case PokemonType.fire:

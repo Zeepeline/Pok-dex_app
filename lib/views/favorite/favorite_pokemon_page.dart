@@ -3,7 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/helpers/toast_helpers.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card.dart';
+import 'package:pokedex_app/core/widgets/card/pokemon_card.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:provider/provider.dart';
@@ -54,16 +54,19 @@ class FavoritePokemonPage extends StatelessWidget {
                       .toList();
 
                   if (favoritePokemon.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset('assets/images/camera.png', width: 100),
-                          const Gap(16),
-                          Text(
-                              """ You haven't added any Pokémon to favorites yet """,
-                              style: AppTextStyles.bodyLarge),
-                        ],
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset('assets/images/camera.png', width: 100),
+                            const Gap(16),
+                            Text(
+                                """ You haven't added any Pokémon to favorites yet """,
+                                style: AppTextStyles.bodyLarge),
+                          ],
+                        ),
                       ),
                     );
                   }

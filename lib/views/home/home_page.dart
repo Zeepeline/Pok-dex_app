@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 import 'package:pokedex_app/core/helpers/debouncer_helpers.dart';
-import 'package:pokedex_app/core/widgets/filter_pokemon_type_bottom_sheet.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
+import 'package:pokedex_app/core/widgets/card/pokemon_card_shimmer.dart';
+import 'package:pokedex_app/core/widgets/modal/filter_pokemon_type_bottom_sheet.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:pokedex_app/providers/pokemon_filter_provider.dart';
@@ -176,14 +177,18 @@ class _HomePageState extends State<HomePage>
         height: 49,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(49),
-          color: Color(0xFF333333),
+          color: context
+              .watch<PokemonFilterProvider>()
+              .selectedType
+              .asPokemonType
+              .color,
         ),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'All Type',
+                '${context.watch<PokemonFilterProvider>().selectedType} Type',
                 style: AppTextStyles.baseText.copyWith(color: Colors.white),
               ),
               Gap(8),

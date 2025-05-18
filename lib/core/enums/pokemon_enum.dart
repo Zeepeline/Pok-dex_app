@@ -1,4 +1,5 @@
 enum PokemonType {
+  all,
   water,
   dragon,
   electric,

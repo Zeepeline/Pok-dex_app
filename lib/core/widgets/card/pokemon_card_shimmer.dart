@@ -19,7 +19,6 @@ class PokemonCardShimmer extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Left section (Text and Chips)
           Expanded(
             flex: 3,
             child: Padding(

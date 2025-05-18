@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/constants/pokemon_types.dart';
-import 'package:pokedex_app/core/widgets/filter_element_chip.dart';
+import 'package:pokedex_app/core/widgets/chip/filter_element_chip.dart';
 import 'package:pokedex_app/providers/pokemon_filter_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +13,6 @@ void showTypeFilterSheet(BuildContext context) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
     builder: (modalContext) {
-      // gunakan context yang benar
       String selectedType = context.read<PokemonFilterProvider>().selectedType;
 
       return SingleChildScrollView(

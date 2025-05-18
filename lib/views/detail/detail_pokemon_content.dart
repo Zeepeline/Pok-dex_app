@@ -5,9 +5,9 @@ import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 import 'package:pokedex_app/core/utils/parse_percantage.dart';
-import 'package:pokedex_app/core/widgets/attribut_display.dart';
-import 'package:pokedex_app/core/widgets/custom_chip.dart';
-import 'package:pokedex_app/core/widgets/pokemon_evolution_card.dart';
+import 'package:pokedex_app/core/widgets/card/pokemon_evolution_card.dart';
+import 'package:pokedex_app/core/widgets/chip/custom_chip.dart';
+import 'package:pokedex_app/core/widgets/dialog/attribut_display.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_detail_provider.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +23,12 @@ class DetailPokemonContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Container(
-        color: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

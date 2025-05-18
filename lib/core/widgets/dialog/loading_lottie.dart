@@ -4,7 +4,7 @@ import 'package:lottie/lottie.dart';
 void showLoadingDialog(BuildContext context) {
   showDialog(
     context: context,
-    barrierDismissible: false, // supaya tidak bisa ditutup sembarangan
+    barrierDismissible: false,
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
