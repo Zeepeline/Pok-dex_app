@@ -1,16 +1,28 @@
-# pokedex_app
+# Pokedex App
 
-A new Flutter project.
+A Flutter-based Pokedex app that lets users browse, search, and filter Pokémon data with smooth pagination and favorite management.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Browse a comprehensive list of Pokémon with pagination.
+- Search Pokémon by name or Pokédex number (supports input with or without `#`).
+- Filter Pokémon by type.
+- Mark Pokémon as favorites and manage favorite list.
+- Responsive UI with loading shimmer effects.
+- Smooth scroll with lazy loading and prefetching.
+- Clean architecture using Provider for state management.
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Home and Favorite Page
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p>
+  <img src="assets/screenshots/home_page.jpeg" alt="Home Screen" width="300" />
+  <img src="assets/screenshots/favorite_page.jpeg" alt="Favorite Screen" width="300" />
+</p>
+
+- Detail Page
+
+<p>
+  <img src="assets/screenshots/detail_page.jpeg" alt="Detail Screen" width="300" />
+</p>
