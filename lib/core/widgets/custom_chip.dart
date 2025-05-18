@@ -4,8 +4,8 @@ import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/enums/pokemon_enum.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 
-class CustomChipContainer extends StatelessWidget {
-  const CustomChipContainer({
+class CustomElementChipContainer extends StatelessWidget {
+  const CustomElementChipContainer({
     super.key,
     required this.element,
     required this.type,

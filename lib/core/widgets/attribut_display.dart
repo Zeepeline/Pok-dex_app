@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 
 class AttributDisplay extends StatelessWidget {
   const AttributDisplay(
-      {super.key, required this.title, required this.data, required this.icon});
+      {super.key,
+      required this.title,
+      required this.data,
+      required this.iconPath});
 
   final String title;
   final String data;
-  final IconData icon;
+  final String iconPath;
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +20,12 @@ class AttributDisplay extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              color: Color(0xFF000000).withValues(alpha: 0.6),
+            SvgPicture.asset(
+              iconPath,
+              colorFilter: ColorFilter.mode(
+                  Color(0xFF000000).withValues(alpha: 0.6), BlendMode.srcIn),
             ),
+            Gap(8),
             Text(
               title,
               style: AppTextStyles.label.copyWith(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SlideFromBottomPage extends Page {
   final Widget child;
 
-  const SlideFromBottomPage({required this.child});
+  const SlideFromBottomPage({required this.child, super.key});
 
   @override
   Route createRoute(BuildContext context) {
