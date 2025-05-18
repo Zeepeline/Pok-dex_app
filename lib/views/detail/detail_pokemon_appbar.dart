@@ -20,8 +20,12 @@ class PokemonDetailAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pokemonName =
-        pokemon.name.replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
+    String result = pokemon.name.split('/').first;
+    final patternClean = RegExp(r'[^\w\s./]');
+    result = result.replaceAll(patternClean, '');
+    result = result.replaceAll(' ', '');
+    final pokemonName = result.toLowerCase();
+
     return SliverAppBar(
       floating: false,
       snap: false,
@@ -103,13 +107,18 @@ class PokemonDetailAppBar extends StatelessWidget {
                           alignment: Alignment.bottomCenter,
                           child: CachedNetworkImage(
                             imageUrl:
-                                'https://play.pokemonshowdown.com/sprites/ani/$pokemonName.gif',
+                                'https://projectpokemon.org/images/normal-sprite/$pokemonName.gif',
                             filterQuality: FilterQuality.high,
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(),
                             ),
-                            errorWidget: (context, url, error) => const Center(
-                                child: Icon(Icons.error, color: Colors.white)),
+                            errorWidget: (context, url, error) => Center(
+                                child: SizedBox(
+                              height: 100,
+                              child: CachedNetworkImage(
+                                imageUrl: pokemon.imageUrl,
+                              ),
+                            )),
                           ),
                         ),
                       )),

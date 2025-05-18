@@ -8,11 +8,18 @@ import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:provider/provider.dart';
 
-class FavoritePokemonPage extends StatelessWidget {
+class FavoritePokemonPage extends StatefulWidget {
   const FavoritePokemonPage({super.key});
 
   @override
+  State<FavoritePokemonPage> createState() => _FavoritePokemonPageState();
+}
+
+class _FavoritePokemonPageState extends State<FavoritePokemonPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -103,4 +110,7 @@ class FavoritePokemonPage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

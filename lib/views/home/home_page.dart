@@ -106,41 +106,35 @@ class _HomePageState extends State<HomePage>
           ),
         ),
       ),
-      body: Padding(
+      body: ListView(
+        controller: _scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: <Widget>[
-              Gap(16),
-              _buildFilterType(),
-              Gap(16),
-              isAnyLoading(context)
-                  ? Center(
-                      child: buildShimmerList(),
-                    )
-                  : Consumer4<PokemonProvider, PokemonSearchProvider,
-                      PokemonFavoriteProvider, PokemonFilterProvider>(
-                      builder: (context, pokemonProvider, searchProvider,
-                          favoriteProvider, filterProvider, _) {
-                        List<PokemonModel> pokemonList = getPokemonList(
-                          all: pokemonProvider,
-                          search: searchProvider,
-                          filter: filterProvider,
-                        );
+        children: [
+          const Gap(16),
+          _buildFilterType(),
+          const Gap(16),
+          isAnyLoading(context)
+              ? buildShimmerList()
+              : Consumer4<PokemonProvider, PokemonSearchProvider,
+                  PokemonFavoriteProvider, PokemonFilterProvider>(
+                  builder: (context, pokemonProvider, searchProvider,
+                      favoriteProvider, filterProvider, _) {
+                    List<PokemonModel> pokemonList = getPokemonList(
+                      all: pokemonProvider,
+                      search: searchProvider,
+                      filter: filterProvider,
+                    );
 
-                        return pokemonList.isEmpty
-                            ? _buildEmptyState()
-                            : PokemonListView(
-                                isLoadingMore: pokemonProvider.isLoadingMore,
-                                pokemonList: pokemonList,
-                              );
-                      },
-                    ),
-              Gap(16),
-            ],
-          ),
-        ),
+                    return pokemonList.isEmpty
+                        ? _buildEmptyState()
+                        : PokemonListView(
+                            isLoadingMore: pokemonProvider.isLoadingMore,
+                            pokemonList: pokemonList,
+                          );
+                  },
+                ),
+          const Gap(16),
+        ],
       ),
     );
   }

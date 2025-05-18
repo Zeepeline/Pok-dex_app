@@ -47,7 +47,9 @@ class PokemonListView extends StatelessWidget {
         final pokemon = pokemonList[index];
         final isFav = favoriteProvider.isFavorite(pokemon.id);
         return InkWell(
-          onTap: () => context.read<AppState>().selectPokemon(pokemon),
+          onTap: () {
+            context.read<AppState>().selectPokemon(pokemon);
+          },
           child: PokemonCard(
             pokemon: pokemon,
             isFavorite: isFav,
