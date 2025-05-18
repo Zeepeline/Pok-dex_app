@@ -6,6 +6,7 @@ import 'package:pokedex_app/data/datasources/pokemon_remote_datasources.dart';
 import 'package:pokedex_app/data/repositories/pokemon_repository.dart';
 import 'package:pokedex_app/providers/pokemon_detail_provider.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
+import 'package:pokedex_app/providers/pokemon_filter_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:pokedex_app/providers/pokemon_search_provider.dart';
 import 'package:pokedex_app/providers/tab_provider.dart';
@@ -33,6 +34,13 @@ Future<void> main() async {
         ),
         ChangeNotifierProxyProvider<PokemonProvider, PokemonSearchProvider>(
           create: (_) => PokemonSearchProvider(),
+          update: (_, pokemonProvider, searchProvider) {
+            searchProvider!.updateAllPokemon(pokemonProvider.allPokemon);
+            return searchProvider;
+          },
+        ),
+        ChangeNotifierProxyProvider<PokemonProvider, PokemonFilterProvider>(
+          create: (_) => PokemonFilterProvider(),
           update: (_, pokemonProvider, searchProvider) {
             searchProvider!.updateAllPokemon(pokemonProvider.allPokemon);
             return searchProvider;
