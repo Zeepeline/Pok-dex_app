@@ -56,50 +56,8 @@ class PokemonSearchProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchByPokedexNumber(String id) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final query = id.toLowerCase().replaceAll('#', '').trim();
-
-      _searchResult = _allPokemon.where((poke) {
-        final pokeIdNormalized =
-            poke.id.toLowerCase().replaceAll('#', '').trim();
-        return pokeIdNormalized.contains(query);
-      }).toList();
-
-      log(_searchResult.toString());
-    } catch (e) {
-      debugPrint('Error: $e');
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
   void clear() {
     _searchResult = [];
     notifyListeners();
-  }
-}
-
-// Fungsi filter yang akan dijalankan di isolate terpisah
-List<PokemonModel> searchInBackground(Map<String, dynamic> params) {
-  final List<PokemonModel> allPokemon = params['allPokemon'];
-  final String query = params['query'].toLowerCase().trim();
-
-  final isNumberSearch = RegExp(r'^#?\d+$').hasMatch(query);
-
-  if (isNumberSearch) {
-    final normalizedQuery = query.replaceAll('#', '');
-    return allPokemon.where((poke) {
-      final pokeIdNormalized = poke.id.toLowerCase().replaceAll('#', '').trim();
-      return pokeIdNormalized.contains(normalizedQuery);
-    }).toList();
-  } else {
-    return allPokemon.where((poke) {
-      return poke.name.toLowerCase().contains(query);
-    }).toList();
   }
 }

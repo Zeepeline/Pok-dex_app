@@ -12,10 +12,12 @@ class PokemonProvider with ChangeNotifier {
   int _currentPage = 0;
   final int _pageSize = 20;
   bool _isLoading = false;
+  bool _isLoadingMore = false;
 
   List<PokemonModel> get pokemonList => _visiblePokemon;
   List<PokemonModel> get allPokemon => _allPokemon;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
 
   Future<void> initData() async {
     if (_allPokemon.isNotEmpty) return;
@@ -38,13 +40,19 @@ class PokemonProvider with ChangeNotifier {
     }
   }
 
-  void fetchNextPokemonPage() {
-    if (_isLoading || _allPokemon.isEmpty) return;
+  Future<void> fetchNextPokemonPage() async {
+    if (_isLoadingMore || _allPokemon.isEmpty) return;
 
     final startIndex = _currentPage * _pageSize;
     final endIndex = (_currentPage + 1) * _pageSize;
 
     if (startIndex >= _allPokemon.length) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    // Simulasi delay fetch (atau jika fetch dari API bisa await di sini)
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final nextPage = _allPokemon.sublist(
       startIndex,
@@ -54,6 +62,7 @@ class PokemonProvider with ChangeNotifier {
     _visiblePokemon.addAll(nextPage);
 
     _currentPage++;
+    _isLoadingMore = false;
     notifyListeners();
   }
 }

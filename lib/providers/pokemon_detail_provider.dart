@@ -4,11 +4,12 @@ import 'package:pokedex_app/data/models/pokemon_model.dart';
 class PokemonDetailProvider extends ChangeNotifier {
   List<PokemonModel> _pokemon = [];
   bool _isLoading = false;
-
-  List<PokemonModel> get pokemon => _pokemon;
+  PokemonModel? _selectedPokemon;
   bool get isLoading => _isLoading;
 
   List<PokemonModel> _allPokemon = [];
+  List<PokemonModel> get pokemon => _pokemon;
+  PokemonModel? get selectedPokemon => _selectedPokemon;
 
   void updateAllPokemon(List<PokemonModel> all) {
     _allPokemon = all;
@@ -31,5 +32,14 @@ class PokemonDetailProvider extends ChangeNotifier {
   void clear() {
     _pokemon = [];
     notifyListeners();
+  }
+
+  void setSelectedPokemon(PokemonModel? pokemon) {
+    _selectedPokemon = pokemon;
+    notifyListeners();
+
+    if (pokemon != null) {
+      fetchByIds(pokemon.evolutions);
+    }
   }
 }
