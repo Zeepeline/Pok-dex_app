@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
-import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
 import 'package:pokedex_app/core/helpers/debouncer_helpers.dart';
-import 'package:pokedex_app/core/helpers/toast_helpers.dart';
 import 'package:pokedex_app/core/widgets/filter_pokemon_type_bottom_sheet.dart';
-import 'package:pokedex_app/core/widgets/pokemon_card.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
 import 'package:pokedex_app/providers/pokemon_filter_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:pokedex_app/providers/pokemon_search_provider.dart';
+import 'package:pokedex_app/views/home/pokemon_listview.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -47,6 +45,19 @@ class _HomePageState extends State<HomePage>
     return all.pokemonList;
   }
 
+  void _setupInfiniteScroll() {
+    _scrollController.addListener(() {
+      final pokemonProvider = context.read<PokemonProvider>();
+      final filterProvider = context.read<PokemonFilterProvider>();
+      if (_scrollController.position.maxScrollExtent <=
+          _scrollController.position.pixels) {
+        filterProvider.selectedType != 'All'
+            ? filterProvider.fetchNextPage()
+            : pokemonProvider.fetchNextPokemonPage();
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -56,20 +67,7 @@ class _HomePageState extends State<HomePage>
       Provider.of<PokemonProvider>(context, listen: false).initData();
     });
 
-    _scrollController.addListener(() {
-      final provider = Provider.of<PokemonProvider>(context, listen: false);
-      final filterProvider =
-          Provider.of<PokemonFilterProvider>(context, listen: false);
-      if (_scrollController.position.maxScrollExtent -
-              _scrollController.position.pixels <=
-          100) {
-        if (filterProvider.selectedType != 'All') {
-          filterProvider.fetchNextPage();
-        } else {
-          provider.fetchNextPokemonPage();
-        }
-      }
-    });
+    _setupInfiniteScroll();
   }
 
   @override
@@ -123,80 +121,17 @@ class _HomePageState extends State<HomePage>
                       PokemonFavoriteProvider, PokemonFilterProvider>(
                       builder: (context, pokemonProvider, searchProvider,
                           favoriteProvider, filterProvider, _) {
-                        final isSearching =
-                            searchProvider.searchText.isNotEmpty;
-                        List<PokemonModel> pokemonList;
-
-                        if (isSearching) {
-                          pokemonList = searchProvider.searchResult;
-                        } else if (filterProvider.selectedType != 'All') {
-                          pokemonList = filterProvider.visibleFilteredPokemon;
-                        } else {
-                          pokemonList = pokemonProvider.pokemonList;
-                        }
+                        List<PokemonModel> pokemonList = getPokemonList(
+                          all: pokemonProvider,
+                          search: searchProvider,
+                          filter: filterProvider,
+                        );
 
                         return pokemonList.isEmpty
-                            ? Center(
-                                child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  children: [
-                                    SvgPicture.network(
-                                        'https://veekun.com/dex/media/pokemon/dream-world/201-question.svg'),
-                                    Gap(16),
-                                    Text(
-                                      'No Pokemon found',
-                                      style: AppTextStyles.subtitle,
-                                    ),
-                                  ],
-                                ),
-                              ))
-                            : ListView.separated(
-                                shrinkWrap: true,
-                                cacheExtent: 500,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: pokemonList.length +
-                                    (pokemonProvider.isLoadingMore ? 1 : 0),
-                                separatorBuilder: (_, __) => Gap(16),
-                                itemBuilder: (context, index) {
-                                  if (index == pokemonList.length) {
-                                    return const PokemonCardShimmer();
-                                  }
-                                  final pokemon = pokemonList[index];
-                                  final isFav =
-                                      favoriteProvider.isFavorite(pokemon.id);
-                                  return InkWell(
-                                    onTap: () {
-                                      context
-                                          .read<AppState>()
-                                          .selectPokemon(pokemon);
-                                    },
-                                    child: PokemonCard(
-                                      pokemon: pokemon,
-                                      isFavorite: isFav,
-                                      onFavoriteTap: () {
-                                        favoriteProvider
-                                            .toggleFavorite(pokemon.id);
-                                        if (!isFav) {
-                                          successToast(
-                                              context,
-                                              'Added to favorites',
-                                              '${pokemon.name} added to favorites!');
-                                        } else {
-                                          failToast(
-                                              context,
-                                              'Removed from favorites',
-                                              '${pokemon.name} removed from favorites!');
-                                        }
-                                      },
-                                    ),
-                                  );
-                                },
+                            ? _buildEmptyState()
+                            : PokemonListView(
+                                isLoadingMore: pokemonProvider.isLoadingMore,
+                                pokemonList: pokemonList,
                               );
                       },
                     ),
@@ -206,6 +141,29 @@ class _HomePageState extends State<HomePage>
         ),
       ),
     );
+  }
+
+  Center _buildEmptyState() {
+    return Center(
+        child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        children: [
+          SvgPicture.network(
+              'https://veekun.com/dex/media/pokemon/dream-world/201-question.svg'),
+          Gap(16),
+          Text(
+            'No Pokemon found',
+            style: AppTextStyles.subtitle,
+          ),
+        ],
+      ),
+    ));
   }
 
   Widget _buildFilterType() {

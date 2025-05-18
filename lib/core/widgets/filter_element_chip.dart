@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
-import 'package:pokedex_app/core/enums/pokemon_enum.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 
 class FilterElementChipContainer extends StatelessWidget {
@@ -16,16 +15,12 @@ class FilterElementChipContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mainType = PokemonType.values.firstWhere(
-      (e) => e.name.toLowerCase() == element.toLowerCase(),
-      orElse: () => PokemonType.normal,
-    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? mainType.color : Colors.black,
+          color: isSelected ? element.asPokemonType.color : Colors.black,
           width: 1,
         ),
       ),
@@ -36,12 +31,12 @@ class FilterElementChipContainer extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: isSelected ? mainType.color : Colors.white,
+              color: isSelected ? element.asPokemonType.color : Colors.white,
               shape: BoxShape.circle,
             ),
             padding: const EdgeInsets.all(4),
             child: SvgPicture.asset(
-              mainType.iconPath,
+              element.asPokemonType.iconPath,
               colorFilter: ColorFilter.mode(
                   isSelected ? Colors.white : Colors.black, BlendMode.srcIn),
             ),

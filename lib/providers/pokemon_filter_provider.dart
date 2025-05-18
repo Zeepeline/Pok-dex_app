@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex_app/core/enums/state_enum.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class PokemonFilterProvider with ChangeNotifier {
   String _selectedType = 'All';
-  bool _isLoading = false;
   List<PokemonModel> _allPokemon = [];
   List<PokemonModel> _filteredPokemon = [];
   final List<PokemonModel> _visiblePokemon = [];
+  PokemonLoadState _state = PokemonLoadState.initial;
 
   int _currentPage = 0;
   final int _pageSize = 20;
 
   String get selectedType => _selectedType;
-  bool get isLoading => _isLoading;
+  bool get isLoading => _state == PokemonLoadState.loading;
+
   List<PokemonModel> get visibleFilteredPokemon => _visiblePokemon;
 
   void updateAllPokemon(List<PokemonModel> all) {
@@ -30,7 +32,7 @@ class PokemonFilterProvider with ChangeNotifier {
   bool isTypeSelected(String type) => _selectedType == type;
 
   Future<void> filterByType(String type) async {
-    _isLoading = true;
+    _state = PokemonLoadState.loading;
     _selectedType = type;
     _currentPage = 0;
     _visiblePokemon.clear();
@@ -51,7 +53,7 @@ class PokemonFilterProvider with ChangeNotifier {
     } catch (e, stackTrace) {
       debugPrint('filterByType Error: $e\n$stackTrace');
     } finally {
-      _isLoading = false;
+      _state = PokemonLoadState.loaded;
       notifyListeners();
     }
   }

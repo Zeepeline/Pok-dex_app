@@ -2,16 +2,18 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pokedex_app/core/enums/state_enum.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class PokemonSearchProvider with ChangeNotifier {
-  bool _isLoading = false;
   List<PokemonModel> _searchResult = [];
   String _searchText = '';
+  PokemonLoadState _state = PokemonLoadState.initial;
 
   List<PokemonModel> get searchResult => _searchResult;
   String get searchText => _searchText;
-  bool get isLoading => _isLoading;
+  PokemonLoadState get state => _state;
+  bool get isLoading => _state == PokemonLoadState.loading;
 
   List<PokemonModel> _allPokemon = [];
 
@@ -20,12 +22,11 @@ class PokemonSearchProvider with ChangeNotifier {
   }
 
   Future<void> fetchByNamesOrIds(String query) async {
-    _isLoading = true;
+    _state = PokemonLoadState.loading;
     notifyListeners();
 
     try {
       _searchText = query;
-
       final search = query.toLowerCase().trim();
 
       // Cek apakah input adalah nomor pokedex (angka atau #di depan)
@@ -52,7 +53,7 @@ class PokemonSearchProvider with ChangeNotifier {
       debugPrint('Error: $e');
     }
 
-    _isLoading = false;
+    _state = PokemonLoadState.loaded;
     notifyListeners();
   }
 

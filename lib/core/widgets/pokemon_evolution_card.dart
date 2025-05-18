@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
-import 'package:pokedex_app/core/enums/pokemon_enum.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 
@@ -17,10 +16,6 @@ class PokemonEvolutionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mainType = PokemonType.values.firstWhere(
-      (e) => e.name.toLowerCase() == pokemon.typeofpokemon[0].toLowerCase(),
-      orElse: () => PokemonType.normal,
-    );
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(90),
@@ -36,7 +31,7 @@ class PokemonEvolutionCard extends StatelessWidget {
             height: 74,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              color: mainType.color,
+              color: pokemon.typeofpokemon[0].toLowerCase().asPokemonType.color,
               borderRadius: BorderRadius.circular(71),
             ),
             child: Padding(
@@ -58,23 +53,22 @@ class PokemonEvolutionCard extends StatelessWidget {
                 spacing: 4.0,
                 runSpacing: 4.0,
                 children: pokemon.typeofpokemon.asMap().entries.map((entry) {
-                  final pokemonElement = PokemonType.values.firstWhere(
-                    (e) =>
-                        e.name.toLowerCase() ==
-                        pokemon.typeofpokemon[entry.key].toLowerCase(),
-                    orElse: () => PokemonType.normal,
-                  );
-
                   return Container(
                     width: 68,
                     height: 13,
                     padding: const EdgeInsets.all(1),
                     decoration: BoxDecoration(
-                      color: pokemonElement.color,
+                      color: pokemon.typeofpokemon[entry.key]
+                          .toLowerCase()
+                          .asPokemonType
+                          .color,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: SvgPicture.asset(
-                      pokemonElement.iconPath,
+                      pokemon.typeofpokemon[entry.key]
+                          .toLowerCase()
+                          .asPokemonType
+                          .iconPath,
                       width: 10,
                       height: 10,
                       colorFilter:

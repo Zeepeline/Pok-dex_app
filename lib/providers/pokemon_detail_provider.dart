@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex_app/core/enums/state_enum.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
 
 class PokemonDetailProvider extends ChangeNotifier {
   List<PokemonModel> _pokemon = [];
-  bool _isLoading = false;
-  PokemonModel? _selectedPokemon;
-  bool get isLoading => _isLoading;
 
+  PokemonModel? _selectedPokemon;
+  PokemonLoadState _state = PokemonLoadState.initial;
+
+  PokemonLoadState get state => _state;
   List<PokemonModel> _allPokemon = [];
   List<PokemonModel> get pokemon => _pokemon;
   PokemonModel? get selectedPokemon => _selectedPokemon;
+  bool get isLoading => _state == PokemonLoadState.loading;
 
   void updateAllPokemon(List<PokemonModel> all) {
     _allPokemon = all;
   }
 
   Future<void> fetchByIds(List<String> ids) async {
-    _isLoading = true;
+    _state = PokemonLoadState.loading;
     notifyListeners();
 
     try {
@@ -25,7 +28,7 @@ class PokemonDetailProvider extends ChangeNotifier {
       debugPrint('Error: $e');
     }
 
-    _isLoading = false;
+    _state = PokemonLoadState.loaded;
     notifyListeners();
   }
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
-import 'package:pokedex_app/core/enums/pokemon_enum.dart';
 import 'package:pokedex_app/core/extension/pokemon_type_extension.dart';
 import 'package:pokedex_app/core/widgets/custom_chip.dart';
 import 'package:pokedex_app/data/models/pokemon_model.dart';
@@ -21,13 +20,13 @@ class PokemonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mainType = PokemonType.values.firstWhere(
-      (e) => e.name.toLowerCase() == pokemon.typeofpokemon[0].toLowerCase(),
-      orElse: () => PokemonType.normal,
-    );
     return Container(
       decoration: BoxDecoration(
-        color: mainType.color.withValues(alpha: 0.2),
+        color: pokemon.typeofpokemon[0]
+            .toLowerCase()
+            .asPokemonType
+            .color
+            .withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -45,7 +44,7 @@ class PokemonCard extends StatelessWidget {
                     pokemon.name,
                     style: AppTextStyles.headingMedium,
                   ),
-                  Gap(8),
+                  Gap(16),
                   Wrap(
                     spacing: 4.0,
                     runSpacing: 4.0,
@@ -55,12 +54,7 @@ class PokemonCard extends StatelessWidget {
 
                       return CustomElementChipContainer(
                         element: pokemonElement,
-                        type: PokemonType.values.firstWhere(
-                          (e) =>
-                              e.name.toLowerCase() ==
-                              pokemonElement.toLowerCase(),
-                          orElse: () => PokemonType.normal,
-                        ),
+                        type: pokemonElement.toLowerCase().asPokemonType,
                       );
                     }).toList(),
                   )
@@ -69,14 +63,27 @@ class PokemonCard extends StatelessWidget {
             ),
           ),
           Container(
-            height: 130,
             width: MediaQuery.of(context).size.width * 0.4,
             decoration: BoxDecoration(
-              color: mainType.color,
+              color: pokemon.typeofpokemon[0].toLowerCase().asPokemonType.color,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Stack(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      pokemon.typeofpokemon[0]
+                          .toLowerCase()
+                          .asPokemonType
+                          .iconPath,
+                      width: 100,
+                      colorFilter: ColorFilter.mode(
+                          Colors.white.withAlpha(40), BlendMode.srcIn),
+                    ),
+                  ),
+                ),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(16),

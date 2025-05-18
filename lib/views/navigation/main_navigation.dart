@@ -27,8 +27,6 @@ class _MainNavigationState extends State<MainNavigation> {
     super.initState();
     _tabProvider = context.read<TabProvider>();
     _pageController = PageController(initialPage: _tabProvider.selectedIndex);
-
-    // Listen to tab changes and update pageController
     _tabProvider.addListener(() {
       final newIndex = _tabProvider.selectedIndex;
       if (_pageController.hasClients &&
@@ -67,26 +65,32 @@ class _MainNavigationState extends State<MainNavigation> {
         physics: const NeverScrollableScrollPhysics(),
         children: _pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        currentIndex: selectedIndex,
-        onTap: _onItemTapped,
-        showUnselectedLabels: false,
-        selectedLabelStyle: AppTextStyles.label.copyWith(
-          color: const Color(0xFF173EA5),
+      bottomNavigationBar: SizedBox(
+        height: 70,
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          currentIndex: selectedIndex,
+          onTap: _onItemTapped,
+          showUnselectedLabels: false,
+          selectedLabelStyle: AppTextStyles.label.copyWith(
+            color: const Color(0xFF173EA5),
+            height: 2,
+          ),
+          items: [
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/unselected_pokeball.svg'),
+              activeIcon:
+                  SvgPicture.asset('assets/icons/selected_pokeball.svg'),
+              label: 'Pokedéx',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset('assets/icons/unselected_favorite.svg'),
+              activeIcon:
+                  SvgPicture.asset('assets/icons/selected_favorite.svg'),
+              label: 'Favorite',
+            ),
+          ],
         ),
-        items: [
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/unselected_pokeball.svg'),
-            activeIcon: SvgPicture.asset('assets/icons/selected_pokeball.svg'),
-            label: 'Pokedéx',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/icons/unselected_favorite.svg'),
-            activeIcon: SvgPicture.asset('assets/icons/selected_favorite.svg'),
-            label: 'Favorite',
-          ),
-        ],
       ),
     );
   }
