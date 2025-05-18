@@ -85,3 +85,10 @@ extension PokemonTypeExtension on PokemonType {
     }
   }
 }
+
+extension StringToPokemonType on String {
+  PokemonType get asPokemonType => PokemonType.values.firstWhere(
+        (e) => e.name.toLowerCase() == toLowerCase(),
+        orElse: () => PokemonType.normal,
+      );
+}
