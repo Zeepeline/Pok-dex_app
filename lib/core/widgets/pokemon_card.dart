@@ -27,11 +27,8 @@ class PokemonCard extends StatelessWidget {
     );
     return Container(
       decoration: BoxDecoration(
+        color: mainType.color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.black,
-          width: 1,
-        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,7 +53,7 @@ class PokemonCard extends StatelessWidget {
                         pokemon.typeofpokemon.asMap().entries.map((entry) {
                       final pokemonElement = entry.value;
 
-                      return CustomChipContainer(
+                      return CustomElementChipContainer(
                         element: pokemonElement,
                         type: PokemonType.values.firstWhere(
                           (e) =>
@@ -83,17 +80,14 @@ class PokemonCard extends StatelessWidget {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Hero(
-                      tag: 'pokemon-image-${pokemon.id}',
-                      child: CachedNetworkImage(
-                        imageUrl: pokemon.imageUrl,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => const Center(
-                          child: Icon(Icons.error, color: Colors.white),
-                        ),
+                    child: CachedNetworkImage(
+                      imageUrl: pokemon.imageUrl,
+                      fit: BoxFit.contain,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(Icons.error, color: Colors.white),
                       ),
                     ),
                   ),

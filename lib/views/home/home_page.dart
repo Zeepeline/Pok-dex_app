@@ -1,14 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:pokedex_app/core/constants/app_state.dart';
 import 'package:pokedex_app/core/constants/app_text_styles.dart';
+import 'package:pokedex_app/core/helpers/debouncer_helpers.dart';
 import 'package:pokedex_app/core/helpers/toast_helpers.dart';
+import 'package:pokedex_app/core/widgets/filter_pokemon_type_bottom_sheet.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card.dart';
 import 'package:pokedex_app/core/widgets/pokemon_card_shimmer.dart';
+import 'package:pokedex_app/data/models/pokemon_model.dart';
 import 'package:pokedex_app/providers/pokemon_favorite_provider.dart';
+import 'package:pokedex_app/providers/pokemon_filter_provider.dart';
 import 'package:pokedex_app/providers/pokemon_provider.dart';
 import 'package:pokedex_app/providers/pokemon_search_provider.dart';
 import 'package:provider/provider.dart';
@@ -23,40 +25,68 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
-  Timer? _debounce;
+  final TextEditingController _searchController = TextEditingController();
+  late Debouncer _debouncer;
+
+  bool isAnyLoading(BuildContext context) {
+    final pokemonProvider = context.watch<PokemonProvider>();
+    final searchProvider = context.watch<PokemonSearchProvider>();
+    final filterProvider = context.watch<PokemonFilterProvider>();
+    return pokemonProvider.isLoading ||
+        searchProvider.isLoading ||
+        filterProvider.isLoading;
+  }
+
+  List<PokemonModel> getPokemonList({
+    required PokemonProvider all,
+    required PokemonSearchProvider search,
+    required PokemonFilterProvider filter,
+  }) {
+    if (search.searchText.isNotEmpty) return search.searchResult;
+    if (filter.selectedType != 'All') return filter.visibleFilteredPokemon;
+    return all.pokemonList;
+  }
 
   @override
   void initState() {
     super.initState();
+
+    _debouncer = Debouncer(milliseconds: 400);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PokemonProvider>(context, listen: false).initData();
     });
 
     _scrollController.addListener(() {
       final provider = Provider.of<PokemonProvider>(context, listen: false);
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent) {
-        provider.fetchNextPokemonPage();
+      final filterProvider =
+          Provider.of<PokemonFilterProvider>(context, listen: false);
+      if (_scrollController.position.maxScrollExtent -
+              _scrollController.position.pixels <=
+          100) {
+        if (filterProvider.selectedType != 'All') {
+          filterProvider.fetchNextPage();
+        } else {
+          provider.fetchNextPokemonPage();
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _debouncer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final provider = context.watch<PokemonProvider>();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Container(
+          padding: const EdgeInsets.only(top: 16.0, bottom: 16),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -67,13 +97,11 @@ class _HomePageState extends State<HomePage>
               ),
             ],
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: _buildSearchField(),
-              ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: _buildSearchField(),
             ),
           ),
         ),
@@ -87,35 +115,25 @@ class _HomePageState extends State<HomePage>
               Gap(16),
               _buildFilterType(),
               Gap(16),
-              provider.isLoading
-                  ? const Center(
-                      child: Column(
-                      children: [
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                        PokemonCardShimmer(),
-                        Gap(16),
-                      ],
-                    ))
-                  : Consumer3<PokemonProvider, PokemonSearchProvider,
-                      PokemonFavoriteProvider>(
+              isAnyLoading(context)
+                  ? Center(
+                      child: buildShimmerList(),
+                    )
+                  : Consumer4<PokemonProvider, PokemonSearchProvider,
+                      PokemonFavoriteProvider, PokemonFilterProvider>(
                       builder: (context, pokemonProvider, searchProvider,
-                          favoriteProvider, _) {
+                          favoriteProvider, filterProvider, _) {
                         final isSearching =
                             searchProvider.searchText.isNotEmpty;
-                        final pokemonList = isSearching
-                            ? searchProvider.searchResult
-                            : pokemonProvider.pokemonList;
+                        List<PokemonModel> pokemonList;
+
+                        if (isSearching) {
+                          pokemonList = searchProvider.searchResult;
+                        } else if (filterProvider.selectedType != 'All') {
+                          pokemonList = filterProvider.visibleFilteredPokemon;
+                        } else {
+                          pokemonList = pokemonProvider.pokemonList;
+                        }
 
                         return pokemonList.isEmpty
                             ? Center(
@@ -140,10 +158,15 @@ class _HomePageState extends State<HomePage>
                               ))
                             : ListView.separated(
                                 shrinkWrap: true,
+                                cacheExtent: 500,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemCount: pokemonList.length,
+                                itemCount: pokemonList.length +
+                                    (pokemonProvider.isLoadingMore ? 1 : 0),
                                 separatorBuilder: (_, __) => Gap(16),
                                 itemBuilder: (context, index) {
+                                  if (index == pokemonList.length) {
+                                    return const PokemonCardShimmer();
+                                  }
                                   final pokemon = pokemonList[index];
                                   final isFav =
                                       favoriteProvider.isFavorite(pokemon.id);
@@ -176,7 +199,8 @@ class _HomePageState extends State<HomePage>
                                 },
                               );
                       },
-                    )
+                    ),
+              Gap(16),
             ],
           ),
         ),
@@ -184,28 +208,33 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Container _buildFilterType() {
-    return Container(
-      width: double.infinity,
-      height: 49,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(49),
-        color: Color(0xFF333333),
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'All Type',
-              style: AppTextStyles.baseText.copyWith(color: Colors.white),
-            ),
-            Gap(8),
-            Icon(
-              Icons.keyboard_arrow_down,
-              color: Colors.white,
-            )
-          ],
+  Widget _buildFilterType() {
+    return InkWell(
+      onTap: () {
+        showTypeFilterSheet(context);
+      },
+      child: Container(
+        width: double.infinity,
+        height: 49,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(49),
+          color: Color(0xFF333333),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'All Type',
+                style: AppTextStyles.baseText.copyWith(color: Colors.white),
+              ),
+              Gap(8),
+              Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.white,
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -213,6 +242,7 @@ class _HomePageState extends State<HomePage>
 
   TextField _buildSearchField() {
     return TextField(
+      controller: _searchController,
       decoration: InputDecoration(
         hintText: 'Find the Pokemon',
         alignLabelWithHint: true,
@@ -247,12 +277,26 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       onChanged: (value) {
-        if (_debounce?.isActive ?? false) _debounce!.cancel();
-        _debounce = Timer(const Duration(milliseconds: 300), () {
-          Provider.of<PokemonSearchProvider>(context, listen: false)
-              .fetchByNames(value);
+        _debouncer.run(() {
+          context.read<PokemonSearchProvider>().fetchByNamesOrIds(value);
         });
       },
+    );
+  }
+
+  Widget buildShimmerList() {
+    return const Column(
+      children: [
+        PokemonCardShimmer(),
+        Gap(16),
+        PokemonCardShimmer(),
+        Gap(16),
+        PokemonCardShimmer(),
+        Gap(16),
+        PokemonCardShimmer(),
+        Gap(16),
+        PokemonCardShimmer(),
+      ],
     );
   }
 

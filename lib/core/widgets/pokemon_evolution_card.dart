@@ -47,28 +47,41 @@ class PokemonEvolutionCard extends StatelessWidget {
           Gap(16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 pokemon.name,
                 style: AppTextStyles.baseText,
               ),
               Gap(8),
-              Row(
-                children: [
-                  Container(
+              Wrap(
+                spacing: 4.0,
+                runSpacing: 4.0,
+                children: pokemon.typeofpokemon.asMap().entries.map((entry) {
+                  final pokemonElement = PokemonType.values.firstWhere(
+                    (e) =>
+                        e.name.toLowerCase() ==
+                        pokemon.typeofpokemon[entry.key].toLowerCase(),
+                    orElse: () => PokemonType.normal,
+                  );
+
+                  return Container(
                     width: 68,
+                    height: 13,
+                    padding: const EdgeInsets.all(1),
                     decoration: BoxDecoration(
-                        color: mainType.color,
-                        borderRadius: BorderRadius.circular(20)),
+                      color: pokemonElement.color,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: SvgPicture.asset(
-                      mainType.iconPath,
+                      pokemonElement.iconPath,
                       width: 10,
                       height: 10,
                       colorFilter:
                           ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
-                  )
-                ],
+                  );
+                }).toList(),
               )
             ],
           )

@@ -25,7 +25,9 @@ class MyRouterDelegate extends RouterDelegate<Object>
           MaterialPage(child: MainNavigation()),
           if (appState.selectedPokemon != null)
             SlideFromBottomPage(
-                child: DetailPokemonPage(pokemon: appState.selectedPokemon!)),
+              key: ValueKey(appState.selectedPokemon!.id),
+              child: DetailPokemonPage(pokemon: appState.selectedPokemon!),
+            ),
         ],
         onDidRemovePage: (page) {
           appState.goToHome();
